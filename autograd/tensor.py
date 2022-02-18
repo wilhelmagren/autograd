@@ -6,6 +6,9 @@ Last edited: 16-02-2022
 """
 import numpy as np
 
+from functools import partialmethod
+
+
 
 class Tensor(object):
     def __init__(self, data, device='cpu', requires_grad=False):
@@ -16,9 +19,11 @@ class Tensor(object):
 
         if isinstance(data, list):
             data = np.array(data, dtype=np.float32)
+        elif isinstance(data, np.float32):
+            data = np.array(data, dtype=np.float32)
         elif not isinstance(data, np.ndarray):
             raise TypeError(
-                    'Error constructing tensor with {data=}')
+                    f'Error constructing tensor with {data=}')
 
         self.data = data
     
@@ -41,17 +46,16 @@ class Tensor(object):
             assert self.data.size == 1
             self.grad = np.ones_like(self.data)
 
-        assert(self.grad is not None)
-
         gradients = self._ctx.backward(self._ctx, self.grad)
         gradients = [gradients] if len(self._ctx.parents) == 1 else gradients
-        for t, g in zip(self._ctx.parents, gradients):
-            if g.shape != t.data.shape:
-                raise ValueError(
-                        f'Gradient shape must match tensor shape, {g.shape} {t.data.shape}')
-            t.grad = g
-            t.backward(allow_fill=False)
 
+        for tensor, gradient in zip(self._ctx.parents, gradients):
+            if gradient is None:
+                continue
+
+            tensor.grad = gradient
+            tensor.backward(allow_fill=False)
+        
     @property
     def shape(self):
         return self.data.shape
@@ -87,7 +91,6 @@ class Tensor(object):
 
 
 
-
 class Function(object):
     def __init__(self, *tensors):
         self.parents = tensors
@@ -98,13 +101,15 @@ class Function(object):
         self.saved_tensors.extend(x)
 
     def apply(self, arg, *x):
+        """
+        First, create the function which is the attribute arg,
+        the tensors *x are saved as parents attributes in the 
+        context ctx. Perform the forward pass on the created
+        function, applying the operation between the contexts
+        data and the argument data in *x.
+        Save the function context in the return tensor.
+        """
         ctx = arg(self, *x)
         ret = Tensor(arg.forward(ctx, self.data, *[t.data for t in x]))
         ret._ctx = ctx
         return ret
-
-
-def register(name, func):
-    setattr(Tensor, name, partialmethod(func.apply, func))
-
-
