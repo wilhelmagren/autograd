@@ -22,6 +22,19 @@ __allops__ = [
     'sum'
 ]
 
+"""
+__allfuncs__ = [
+    Add,
+    Sub,
+    Mul,
+    Dot,
+    Div,
+    Pow,
+    Log,
+    Sum
+]
+"""
+
 def _register(names, funcs):
     """
 
