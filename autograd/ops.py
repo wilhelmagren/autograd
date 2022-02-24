@@ -19,7 +19,9 @@ __allops__ = [
     'div',
     'pow',
     'log',
-    'sum'
+    'sum',
+    'logsoftmax',
+    'relu'
 ]
 
 """
@@ -63,6 +65,10 @@ class Dot(Function):
     Given vectors u and v, the gradient of the dot product becomes
     grad(u * v) = grad(u).T*v + grad(v).T*u
     """
+    
+    def __str__(self):
+        return 'Dot'
+
     @staticmethod
     def forward(ctx, x, w):
         ctx.save_for_backward(x, w)
@@ -77,6 +83,10 @@ class Dot(Function):
 
 
 class Add(Function):
+
+    def __str__(self):
+        return '<autograd.ops.Add>'
+
     @staticmethod
     def forward(ctx, x, y):
         return x + y
@@ -87,6 +97,10 @@ class Add(Function):
 
 
 class Mul(Function):
+
+    def __str__(self):
+        return '<autograd.ops.Mul>'
+
     @staticmethod
     def forward(ctx, x, w):
         ctx.save_for_backward(x, w)
@@ -99,6 +113,10 @@ class Mul(Function):
 
 
 class Sum(Function):
+
+    def __str__(self):
+        return '<autograd.ops.Sum>'
+
     @staticmethod
     def forward(ctx, x):
         ctx.save_for_backward(x)
@@ -110,5 +128,41 @@ class Sum(Function):
         return prev_grad * np.ones_like(x)
 
 
+class ReLU(Function):
+    
+    def __str__(self):
+        return '<autograd.ops.ReLU>'
 
-_register(['dot', 'add', 'mul', 'sum'], [Dot, Add, Mul, Sum])
+    @staticmethod
+    def forward(ctx, x):
+        ctx.save_for_backward(x)
+        return np.maximum(x, 0)
+    
+    @staticmethod
+    def backward(ctx, prev_grad):
+        x, = ctx.saved_tensors
+        grad = prev_grad.copy()
+        grad[x < 0] = 0
+        return grad
+
+
+class LogSoftmax(Function):
+
+    def __str__(self):
+        return '<autograd.ops.LogSoftmax>'
+
+    @staticmethod
+    def forward(ctx, x):
+        def logsumexp(y):
+            c = y.max(axis=1)
+            return c + np.log(np.exp(y - c.reshape((-1, 1))).sum(axis=1))
+        ls = x - logsumexp(x).reshape((-1, 1))
+        ctx.save_for_backward(ls)
+        return ls
+
+    @staticmethod
+    def backward(ctx, prev_grad):
+        x, = ctx.saved_tensors
+        return x - np.exp(x) * x.sum(axis=1).reshape((-1, 1))
+
+_register(['dot', 'add', 'mul', 'sum', 'relu', 'logsoftmax'], [Dot, Add, Mul, Sum, ReLU, LogSoftmax])

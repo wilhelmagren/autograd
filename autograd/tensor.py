@@ -7,12 +7,13 @@ Last edited: 16-02-2022
 import numpy as np
 
 from functools import partialmethod
+from .device import _get_device
 
 
 
 class Tensor(object):
     def __init__(self, data, device='cpu', requires_grad=False):
-        self.device = device
+        self.device = _get_device(device)
         self.requires_grad = requires_grad
         self.grad = None
         self._ctx = None
@@ -21,11 +22,11 @@ class Tensor(object):
             data = np.array(data, dtype=np.float32)
         elif isinstance(data, np.float32):
             data = np.array(data, dtype=np.float32)
-        elif not isinstance(data, np.ndarray):
-            raise TypeError(
-                    f'Error constructing tensor with {data=}')
 
         self.data = data
+
+    def __repr__(self):
+        return f'<autograd.tensor.Tensor:\n{self.data} device={self.device} _ctx={self._ctx} grad={self.grad}>'
     
     def backward(self, allow_fill=True):
         """func performs backward pass in the created
@@ -88,6 +89,10 @@ class Tensor(object):
     def uniform(cls, *shape, **kwargs):
         return cls((np.random.uniform(-1., 1., size=shape)
             /np.sqrt(np.prod(shape))).astype(np.float32), **kwargs)
+
+    def mean(self):
+        div = Tensor(np.array([1/self.data.size]))
+        return self.sum().mul(div)
 
 
 
