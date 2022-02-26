@@ -65,13 +65,13 @@ class Sub(Function):
         return prev_grad, -prev_grad
 
 class Sum(Function):
-    def forward(self, x):
-        self.save_for_backward(x)
-        return np.array([x.sum()])
+    def forward(self, x, axis):
+        self.save_for_backward(x.shape)
+        return x.sum(axis, keepdims=True)
 
     def backward(self, prev_grad):
-        x, = self.saved_tensors
-        return prev_grad * np.ones_like(x)
+        shape, = self.saved_tensors
+        return prev_grad.expand(shape)
 
 class Mul(Function):
     def forward(self, x, y):
@@ -131,7 +131,7 @@ class Reshape(Function):
 
 class Max(Function):
     def forward(self, x, axis):
-        mx = x.amax(axis=axis, keepdims=True)
+        mx = np.amax(x, axis=axis, keepdims=True)
         self.save_for_backward(x, axis, mx)
         return mx
 

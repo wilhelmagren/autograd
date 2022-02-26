@@ -46,10 +46,16 @@ class Tensor(object):
     
     def mean(self):
         div = Tensor(np.array([1 / self.data.size], dtype=np.float32))
-        return self.sum().mul(div)
-
+        return self.sum(axis=None).mul(div)
+    
     def logsoftmax(self):
-        return self.sub(self.exp().sum().log())
+        new_shape = list(self.shape)[:-1] + [1]
+        m = self.max(axis=len(self.shape)-1).reshape(shape=new_shape)
+        logsum = m.add((self.sub(m)).exp().sum(axis=len(self.shape)-1).reshape(shape=new_shape).log())
+        return self.sub(m)
+
+    #def logsoftmax(self):
+    #    return self.sub(self.exp().sum().log())
 
     def backward(self, allow_fill=True):
         if self._ctx is None:
