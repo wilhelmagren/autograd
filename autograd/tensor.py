@@ -17,7 +17,7 @@ class Tensor(object):
         self.data = data
 
     def __repr__(self):
-        return f'<autograd.tensor.Tensor {self.data}, grad={self.grad}, _ctx={self._ctx}'
+        return f'<autograd.tensor.Tensor {self.data}, grad={self.grad}, _ctx={self._ctx}>'
 
     @property
     def shape(self):
