@@ -47,8 +47,8 @@ class Tensor(object):
         if self.grad is None and allow_fill:
             self.grad = np.ones_like(self.data)
         
-        parents = self.ctx_parents
-        gradients = self._ctx.backward(self._ctx, self.grad)
+        parents = self._ctx.parents
+        gradients = self._ctx.backward(self.grad)
         gradients = [gradients] if len(parents) == 1 else gradients
         
         for tensor, gradient in zip(parents, gradients):
