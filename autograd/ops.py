@@ -19,6 +19,7 @@ def _register_all():
     allops['add'] = Add
     allops['sum'] = Sum
     allops['mul'] = Mul
+    allops['matmul'] = Matmul
     for name, func in allops.items():
         setattr(Tensor, name, partialmethod(func.apply, func))
 
@@ -67,6 +68,15 @@ class Mul(Function):
     def backward(self, prev_grad):
         x, y = self.saved_tensors
         return y*prev_grad, x*prev_grad
+
+class Matmul(Function):
+    def forward(self, x, y):
+        self.save_for_backward(x, y)
+        return x @ y
+
+    def backward(self, prev_grad):
+        x, y = self.saved_tensors
+        return prev_grad @ y, x.T @ prev_grad
 
 
 _register_all()
