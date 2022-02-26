@@ -1,4 +1,5 @@
 import numpy as np
+np.set_printoptions(formatter={'float': lambda x: '{0:0.4f}'.format(x)})
 
 class Tensor(object):
     def __init__(self, data, requires_grad=True):
