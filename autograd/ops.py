@@ -17,9 +17,12 @@ __all__ = [
 def _register_all():
     allops = {}
     allops['add'] = Add
+    allops['sub'] = Sub
     allops['sum'] = Sum
     allops['mul'] = Mul
     allops['matmul'] = Matmul
+    allops['log'] = Log
+    allops['exp'] = Exp
     for name, func in allops.items():
         setattr(Tensor, name, partialmethod(func.apply, func))
 
@@ -51,6 +54,13 @@ class Add(Function):
     def backward(self, prev_grad):
         return prev_grad, prev_grad
 
+class Sub(Function):
+    def forward(self, x, y):
+        return x - y
+
+    def backward(self, prev_grad):
+        return prev_grad, -prev_grad
+
 class Sum(Function):
     def forward(self, x):
         self.save_for_backward(x)
@@ -77,6 +87,25 @@ class Matmul(Function):
     def backward(self, prev_grad):
         x, y = self.saved_tensors
         return prev_grad @ y, x.T @ prev_grad
+
+class Log(Function):
+    def forward(self, x):
+        self.save_for_backward(x)
+        return np.log(x)
+
+    def backward(self, prev_grad):
+        x, = self.saved_tensors
+        return prev_grad / x
+
+class Exp(Function):
+    def forward(self, x):
+        x = np.exp(x.clip(-80, 80))
+        self.save_for_backward(x)
+        return x
+    
+    def backward(self, prev_grad):
+        x, = self.saved_tensors
+        return prev_grad * x
 
 
 _register_all()

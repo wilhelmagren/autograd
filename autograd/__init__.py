@@ -1,1 +1,1 @@
-from autograd import tensor, ops, optim
+from autograd import tensor, ops, optim, losses

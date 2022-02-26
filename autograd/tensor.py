@@ -47,6 +47,9 @@ class Tensor(object):
         div = Tensor(np.array([1 / self.data.size], dtype=np.float32))
         return self.sum().mul(div)
 
+    def logsoftmax(self):
+        return self.sub(self.exp().sum().log())
+
     def backward(self, allow_fill=True):
         if self._ctx is None:
             return
