@@ -8,11 +8,6 @@ class Tensor(object):
 
         if isinstance(data, list) or isinstance(data, np.float32):
             data = np.array(data, dtype=np.float32)
-        elif isinstance(data, np.ndarray):
-            data = data.astype(np.float32)
-        else:
-            raise ValueError(
-                    f'Unknown data given to Tensor, {data}')
 
         self.data = data
 
@@ -26,6 +21,18 @@ class Tensor(object):
     @property
     def dtype(self):
         return self.data.dtype
+
+    @classmethod
+    def zeros(cls, *shape, **kwargs):
+        return cls(np.zeros(shape).astype(np.float32), **kwargs)
+    
+    @classmethod
+    def ones(cls, *shape, **kwargs):
+        return cls(np.ones(shape).astype(np.float32), **kwargs)
+
+    @classmethod
+    def randn(cls, *shape, **kwargs):
+        return cls(np.random.randn(*shape).astype(np.float32), **kwargs)
 
     @classmethod
     def uniform(cls, *shape, **kwargs):
