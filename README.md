@@ -24,3 +24,9 @@ print(w.grad)  # dy/dw
 
 ### Installation
 You do not want to even bother installing this. Just use PyTorch instead...
+
+### TODO
+- more ops [ReLU, tanh, dot, log, ...]
+- implement optimizers [Adam, SGD, adagrad, ...]
+- neural networks
+- losses
