@@ -1,168 +1,82 @@
-"""
-Implementation of derivable operations.
-
-Authors: Wilhelm Ågren <wagren@kth.se>
-Last edited: 17-02-2022
-"""
 import numpy as np
 
-from .tensor import Tensor
-from .tensor import Function
 from functools import partialmethod
+from .tensor import Tensor
 
 
-__allops__ = [
+__all__ = [
     'add',
     'sub',
     'mul',
     'dot',
-    'div',
-    'pow',
-    'log',
-    'sum',
-    'logsoftmax',
-    'relu'
+    'matmul',
+    'sum'
 ]
 
-"""
-__allfuncs__ = [
-    Add,
-    Sub,
-    Mul,
-    Dot,
-    Div,
-    Pow,
-    Log,
-    Sum
-]
-"""
 
-def _register(names, funcs):
-    """
-
-    partialmethod freezes the given method with the specific
-    argument. So the method func.apply is frozen with 
-    the function as argument. This decides how func.apply has
-    to be implemented, since the argument is the function 
-    to apply...
-
-    Parameters
-    ----------
-    ops: list | tuple
-        Iterable collection of operations to register.
-        Should be either __allops__ or a subset of them.
-    """
-    for name, func in zip(names, funcs):
-        if name in __allops__:
-            setattr(Tensor, name, partialmethod(func.apply, func))
+def _register_all():
+    allops = {}
+    allops['add'] = Add
+    allops['sum'] = Sum
+    allops['mul'] = Mul
+    allops['matmul'] = Matmul
+    for name, func in allops.items():
+        setattr(Tensor, name, partialmethod(func.apply, func))
 
 
+class Function(object):
+    def __init__(self, *tensors):
+        self.parents = tensors
+        self.saved_tensors = []
+        self.requires_grad = any([tensor.requires_grad for tensor in tensors])
 
-class Dot(Function):
-    """
-    Gradient
-    --------
-    Given vectors u and v, the gradient of the dot product becomes
-    grad(u * v) = grad(u).T*v + grad(v).T*u
-    """
-    
-    def __str__(self):
-        return 'Dot'
+    def save_for_backward(self, *x):
+        self.saved_tensors.extend(x)
 
-    @staticmethod
-    def forward(ctx, x, w):
-        ctx.save_for_backward(x, w)
-        return x.dot(w)
+    def apply(self, arg, *x):
+        """ arg is the to be initialized context of the function.
+        a partialmethod is created
+        """
+        ctx = arg(self, *x)
+        ret = Tensor(ctx.forward(self.data, *[tensor.data for tensor in x]))
+        ret._ctx = ctx
 
-    @staticmethod
-    def backward(ctx, prev_grad):
-        x, w = ctx.saved_tensors
-        grad_x = prev_grad.dot(w.T)
-        grad_w = prev_grad.T.dot(x).T
-        return (grad_x, grad_w)
+        return ret
 
 
 class Add(Function):
-
-    def __str__(self):
-        return '<autograd.ops.Add>'
-
-    @staticmethod
-    def forward(ctx, x, y):
+    def forward(self, x, y):
         return x + y
-    
-    @staticmethod
-    def backward(ctx, prev_grad):
-        return (prev_grad, prev_grad)
 
-
-class Mul(Function):
-
-    def __str__(self):
-        return '<autograd.ops.Mul>'
-
-    @staticmethod
-    def forward(ctx, x, w):
-        ctx.save_for_backward(x, w)
-        return x * w
-    
-    @staticmethod
-    def backward(ctx, prev_grad):
-        x, w = ctx.saved_tensors
-        return (w * prev_grad, x * prev_grad)
-
+    def backward(self, prev_grad):
+        return prev_grad, prev_grad
 
 class Sum(Function):
-
-    def __str__(self):
-        return '<autograd.ops.Sum>'
-
-    @staticmethod
-    def forward(ctx, x):
-        ctx.save_for_backward(x)
+    def forward(self, x):
+        self.save_for_backward(x)
         return np.array([x.sum()])
-    
-    @staticmethod
-    def backward(ctx, prev_grad):
-        x, = ctx.saved_tensors
+
+    def backward(self, prev_grad):
+        x, = self.saved_tensors
         return prev_grad * np.ones_like(x)
 
-
-class ReLU(Function):
+class Mul(Function):
+    def forward(self, x, y):
+        self.save_for_backward(x, y)
+        return x * y
     
-    def __str__(self):
-        return '<autograd.ops.ReLU>'
+    def backward(self, prev_grad):
+        x, y = self.saved_tensors
+        return y*prev_grad, x*prev_grad
 
-    @staticmethod
-    def forward(ctx, x):
-        ctx.save_for_backward(x)
-        return np.maximum(x, 0)
-    
-    @staticmethod
-    def backward(ctx, prev_grad):
-        x, = ctx.saved_tensors
-        grad = prev_grad.copy()
-        grad[x < 0] = 0
-        return grad
+class Matmul(Function):
+    def forward(self, x, y):
+        self.save_for_backward(x, y)
+        return x @ y
+
+    def backward(self, prev_grad):
+        x, y = self.saved_tensors
+        return prev_grad @ y, x.T @ prev_grad
 
 
-class LogSoftmax(Function):
-
-    def __str__(self):
-        return '<autograd.ops.LogSoftmax>'
-
-    @staticmethod
-    def forward(ctx, x):
-        def logsumexp(y):
-            c = y.max(axis=1)
-            return c + np.log(np.exp(y - c.reshape((-1, 1))).sum(axis=1))
-        ls = x - logsumexp(x).reshape((-1, 1))
-        ctx.save_for_backward(ls)
-        return ls
-
-    @staticmethod
-    def backward(ctx, prev_grad):
-        x, = ctx.saved_tensors
-        return x - np.exp(x) * x.sum(axis=1).reshape((-1, 1))
-
-_register(['dot', 'add', 'mul', 'sum', 'relu', 'logsoftmax'], [Dot, Add, Mul, Sum, ReLU, LogSoftmax])
+_register_all()
