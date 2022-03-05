@@ -11,6 +11,8 @@ class Tensor(object):
             data = data.astype(dtype)
         elif isinstance(data, np.float32) or isinstance(data, np.uint8):
             data = np.array([data]).astype(data.dtype)
+        elif isinstance(data, np.float64):
+            data = np.array([data]).astype(np.float32)
         else:
             raise ValueError(
                 f'unknown data instance passed to Tensor.__init__, {type(data)}')
@@ -20,7 +22,8 @@ class Tensor(object):
         self._ctx = None
     
     def __repr__(self):
-        return f''
+        return f'<{self.__class__.__module__}.{self.__class__.__qualname__}\n' \
+        f'{self.data}>'
     
     def __str__(self):
         return f'<autograd.Tensor\n{self.data}\n' \
@@ -69,7 +72,7 @@ class Tensor(object):
             
         if self.grad is None and allow_fill:
             assert self.shape == (1, )
-            self.grad = np.ones_like(self.data)
+            self.grad = np.ones_like(self.data).reshape((-1, 1))
         
         parents = self._ctx.parents
         gradients = self._ctx.backward(self.grad)
@@ -84,6 +87,3 @@ class Tensor(object):
             
             parent.backward(allow_fill=False)
         
-            
-    
-    
