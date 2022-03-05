@@ -63,4 +63,27 @@ class Tensor(object):
     def full(cls, val, *shape, **kwargs):
         return cls(np.full(shape, val), **kwargs)
     
+    def backward(self, allow_fill=True):
+        if self._ctx is None:
+            return
+            
+        if self.grad is None and allow_fill:
+            assert self.shape == (1, )
+            self.grad = np.ones_like(self.data)
+        
+        parents = self._ctx.parents
+        gradients = self._ctx.backward(self.grad)
+        gradients = [gradients] if len(parents) == 1 else gradients
+        
+        for gradient, parent in zip(gradients, parents):
+            if gradient is None:
+                continue
+            
+            if parent.requires_grad:
+                parent.grad = gradient
+            
+            parent.backward(allow_fill=False)
+        
+            
+    
     
