@@ -13,7 +13,7 @@ class Tensor(object):
             data = np.array([data]).astype(data.dtype)
         elif isinstance(data, np.float64):
             data = np.array([data]).astype(np.float32)
-	elif isinstance(datam np.uint16):
+        elif isinstance(datam np.uint16):
             data = np.array([data]).astype(np.uint8)
         else:
             raise ValueError(
