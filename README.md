@@ -9,6 +9,8 @@ It was created as a means to verify and test my personal knowledge on how practi
 ```python
 from autograd import Tensor
 
+# since x is our input data we do not want to change its 
+# values, hence, no gradient required for it.
 x = Tensor([[-1.4, 2.5, 7.3]], requires_grad=False)
 w = Tensor.eye(3)
 
@@ -20,7 +22,7 @@ print(w.grad)  # dy/dw
 ```
 
 ### Installation
-You do not want to even bother installing this. Just use PyTorch instead...
+Just install PyTorch instead.
 
 ### Running tests
 ```python
@@ -30,3 +32,4 @@ python3 -m unittest
 - more ops [tanh, log, exp, sigmoid, Conv2d, ...]
 - implement Adam optimizer
 - losses module
+- write installation steps and requirements
