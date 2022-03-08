@@ -22,7 +22,7 @@ class TestMNISTdigits(unittest.TestCase):
         X_train, Y_train, X_test, Y_test = fetch_mnist()
         X_train = X_train.reshape((-1, 784))
         X_test = X_test.reshape((-1, 784))
-        epochs = 200
+        epochs = 300
         batch_size = 128
 
         for _ in (t := trange(epochs, disable=os.getenv('CI') is not None)):
@@ -58,7 +58,7 @@ class TestMNISTfashion(unittest.TestCase):
         X_train, Y_train, X_test, Y_test = fetch_mnist('fashion')
         X_train = X_train.reshape((-1, 784))
         X_test = X_test.reshape((-1, 784))
-        epochs = 200
+        epochs = 300
         batch_size = 128
 
         for _ in (t := trange(epochs, disable=os.getenv('CI') is not None)):
