@@ -60,3 +60,12 @@ class TestOps(unittest.TestCase):
     def test_logsoftmax(self):
         _test_op([(20, 30)], lambda x: torch.nn.LogSoftmax(dim=1)(x), Tensor.logsoftmax, 'logsoftmax')
 
+    def test_exp(self):
+        _test_op([(20, 30)], lambda x: x.exp(), Tensor.exp, 'exp')
+
+    def test_log(self):
+        _test_op([(20, 30)], lambda x: x.log(), Tensor.log, 'log')
+
+    def test_sigmoid(self):
+        _test_op([(20, 30)], lambda x: x.sigmoid(), Tensor.sigmoid, 'sigmoid')
+

@@ -106,6 +106,38 @@ class LogSoftmax(Function):
         return prev_grad - np.exp(logsumexp) * prev_grad.sum(axis=1).reshape((-1, 1))
         
 
+class Exp(Function):
+    def forward(self, x):
+        result = np.exp(x)
+        self.save_for_backward(result)
+        return result
+
+    def backward(self, prev_grad):
+        x, = self.saved_tensors
+        return prev_grad * x
+
+
+class Log(Function):
+    def forward(self, x):
+        self.save_for_backward(x)
+        return np.log(x)
+    
+    def backward(self, prev_grad):
+        x, = self.saved_tensors
+        return prev_grad / x
+
+
+class Sigmoid(Function):
+    def forward(self, x):
+        result = 1 / (1 + np.exp(-x))
+        self.save_for_backward(result)
+        return result
+    
+    def backward(self, prev_grad):
+        x, = self.saved_tensors
+        return prev_grad * x * (1 - x)
+
+
 __allops__ = [
     ('mean', Mean),
     ('sum', Sum),
@@ -114,7 +146,10 @@ __allops__ = [
     ('dot', Dot),
     ('mul', Mul),
     ('relu', ReLU),
-    ('logsoftmax', LogSoftmax)
+    ('logsoftmax', LogSoftmax),
+    ('exp', Exp),
+    ('log', Log),
+    ('sigmoid', Sigmoid)
 ]
 
 
