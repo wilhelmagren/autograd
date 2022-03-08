@@ -23,9 +23,9 @@ class TestTensor(unittest.TestCase):
         assert t2.dtype == np.float32
         assert t3.dtype == np.uint8
         assert t4.dtype == np.float32
-        t4.uint8()
+        t4.uint()
         assert t4.dtype == np.uint8
-        t4 = t4.float32()
+        t4 = t4.float()
         assert t4.dtype == np.float32
     
     def test_inits(self):

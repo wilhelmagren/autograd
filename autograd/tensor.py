@@ -13,11 +13,9 @@ class Tensor(object):
             data = np.array([data]).astype(data.dtype)
         elif isinstance(data, np.float64):
             data = np.array([data]).astype(np.float32)
-        elif isinstance(data, np.uint16):
-            data = np.array([data]).astype(np.uint8)
         else:
             raise ValueError(
-                f'unknown data instance passed to Tensor.__init__, {type(data)}')
+            f'unknown data instance passed to Tensor.__init__, {type(data)}')
         
         self.data = data
         self.grad = None
@@ -31,11 +29,11 @@ class Tensor(object):
         return f'<autograd.Tensor\n{self.data}\n' \
         f'dtype={self.dtype}, grad_fn={self._ctx}, grad={self.grad}>'
     
-    def uint8(self):
+    def uint(self):
         self.data = self.data.astype(np.uint8)
         return self
     
-    def float32(self):
+    def float(self):
         self.data = self.data.astype(np.float32)
         return self
      
