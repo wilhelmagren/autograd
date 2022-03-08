@@ -9,7 +9,12 @@ class NN(object):
         return self.forward(x)
 
     def parameters(self):
-        pass
+        tensors = []
+        for attr in self.__dict__.values():
+            if isinstance(attr, Tensor):
+                if attr.requires_grad:
+                    tensors.append(attr)
+        return tensors
     
     def forward(self, x):
         raise NotImplementedError(
