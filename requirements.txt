@@ -1,0 +1,4 @@
+numpy
+requests
+torch==1.6.0+cpu
+tqdm
