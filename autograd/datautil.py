@@ -45,3 +45,18 @@ def fetch_mnist():
         datasets[i] = dataset[8:] if i % 2 else dataset[0x10:].reshape((-1, 28, 28))
 
     return datasets
+
+def fetch_fashion_mnist():
+    urls = [
+        'http://fashion-mnist.s3-website.eu-central-1.amazonaws.com/train-images-idx3-ubyte.gz',
+        'http://fashion-mnist.s3-website.eu-central-1.amazonaws.com/train-labels-idx1-ubyte.gz',
+        'http://fashion-mnist.s3-website.eu-central-1.amazonaws.com/t10k-images-idx3-ubyte.gz',
+        'http://fashion-mnist.s3-website.eu-central-1.amazonaws.com/t10k-labels-idx1-ubyte.gz'
+    ]
+    
+    datasets = [_fetch(url) for url in urls]
+    for i, dataset in enumerate(datasets):
+        datasets[i] = dataset[8:] if i % 2 else dataset[0x10:].reshape((-1, 28, 28))
+
+    return datasets
+
