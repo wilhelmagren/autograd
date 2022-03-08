@@ -30,9 +30,9 @@ def _test_op(shapes, torch_func, autograd_func, name):
     for tt, at in zip(torch_tensors, autograd_tensors):
         np.testing.assert_allclose(tt.grad / 5.0, at.grad, atol=1e-6, rtol=1e-3)
 
-    print(f'\ntesting {name} with shapes {shapes},  torch/autograd '\
-          f'forward: {f_torch_ms:.2f} ms / {f_autograd_ms:.2f} ms '\
-          f'backward: {b_torch_ms:.2f} ms / {b_autograd_ms:.2f} ms')
+    print(f'\ntesting {name} with shapes {shapes}, torch/autograd \n'\
+          f'forward: {f_torch_ms:.2f} ms / {f_autograd_ms:.2f} ms   '\
+          f'backward: {b_torch_ms:.2f} ms / {b_autograd_ms:.2f} ms\n')
 
 
 class TestOps(unittest.TestCase):
