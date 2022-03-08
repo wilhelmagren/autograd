@@ -1,6 +1,5 @@
 import numpy as np
 import unittest
-
 from autograd import Tensor
 
 
