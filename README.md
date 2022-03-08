@@ -21,6 +21,38 @@ print(x.grad)  # dy/dx
 print(w.grad)  # dy/dw
 ```
 
+### Neural networks
+It's really simple, just import the NN class and inherit it with your user defined network. Specify your model parameters as attributes of the class and implement a forward pass. Yield model outputs by invoking a call to the model with your input data. An example pipeline can be seen below.
+```python
+from autograd import Tensor, fetch_mnist
+from autograd import SGD, NLLLoss, NN
+
+class Net(NN):
+  def __init__(self):
+    self.l1 = Tensor.uniform(784, 128)
+    self.l2 = Tensor.uniform(128, 10)
+  
+  def forward(self, x):
+    # implement forward pass however you want
+    return x.dot(self.l1).relu().dot(self.l2).logsoftmax()
+
+# fetch data
+X_train, Y_train, X_test, Y_test = fetch_mnist()
+model = Net()
+optimizer = SGD(model.parameters())
+criterion = NLLLoss()
+
+for _ in epochs:
+  logits = model(X_train)
+  loss = criterion(logits, Y_train)
+  
+  optimizer.zero_grad()
+  loss.backward()
+  optimizer.step()
+
+# and calculate final model score below, like in PyTorch
+```
+
 ### Installation
 Just install PyTorch instead.
 
