@@ -6,7 +6,7 @@ name: Unittests
 on:
   push:
     branches:
-      - '**'
+      - master
   pull_request:
     branches:
       - '**'
