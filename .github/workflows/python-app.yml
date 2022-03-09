@@ -28,7 +28,7 @@ jobs:
         pip install numpy
         pip install requests
         pip install tqdm
-        pip install torch==1.7.1
+        pip install torch -f https://download.pytorch.org/whl/torch_stable.html
     - name: Test with unittest
       run: |
         python3 -m unittest
