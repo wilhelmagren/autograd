@@ -10,24 +10,23 @@ on:
   pull_request:
     branches:
       - '**'
-
 jobs:
   build:
-
     runs-on: ubuntu-latest
-
     steps:
     - uses: actions/checkout@v2
     - name: Set up Python 3.10
       uses: actions/setup-python@v2
       with:
         python-version: "3.10"
-    - name: Install dependencies
+    - name: Install required dependencies
       run: |
         python3 -m pip install --upgrade pip
         pip3 install numpy
         pip3 install requests
-        python3 -m pip install -f https://download.pytorch.org/whl/cpu/torch-1.9.0-cp37-cp37m-manylinux2014_aarch64.whl
+    -name: Install unittest dependencies
+      run: |
+        pip3 install torch==1.7.1
     - name: Test with unittest
       run: |
         python3 -m unittest
