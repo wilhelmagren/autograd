@@ -28,7 +28,12 @@ jobs:
         pip install numpy
         pip install requests
         pip install tqdm
-        pip3 install torch==1.10.2+cpu torchvision==0.11.3+cpu torchaudio==0.10.2+cpu -f https://download.pytorch.org/whl/cpu/torch_stable.html
+        git clone https://github.com/pytorch/pytorch.git
+        cd pytorch
+        git checkout v1.0.1
+        git submodule update --init --recursive
+        git status
+        cd -
     - name: Test with unittest
       run: |
         python3 -m unittest
