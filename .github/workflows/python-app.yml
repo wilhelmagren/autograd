@@ -30,7 +30,7 @@ jobs:
         pip install tqdm
         git clone https://github.com/pytorch/pytorch.git
         cd pytorch
-        python setup.py
+        python setup.py install
         cd ..
     - name: Test with unittest
       run: |
