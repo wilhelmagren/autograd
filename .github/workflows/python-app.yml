@@ -30,10 +30,8 @@ jobs:
         pip install tqdm
         git clone https://github.com/pytorch/pytorch.git
         cd pytorch
-        git checkout v1.0.1
-        git submodule update --init --recursive
-        git status
-        cd -
+        python setup.py
+        cd ..
     - name: Test with unittest
       run: |
         python3 -m unittest
