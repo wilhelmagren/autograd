@@ -14,4 +14,4 @@ jobs:
             - uses: actions/checkout@v3
 
             - name: Count Lines of Code (cloc)
-              uses: djdefi/clocl-action@main
+              uses: djdefi/cloc-action@main
