@@ -1,4 +1,4 @@
-![Workflow status badge](https://github.com/willeagren/autograd/actions/workflows/python-app.yml/badge.svg)
+![Unit Tests Workflow Status Badge](https://github.com/willeagren/autograd/actions/workflows/unittests.yml/badge.svg) ![Count Lines of Code Workflow Status Badge](https://github.com/willeagren/autograd/actions/workflows/cloc.yml/badge.svg)
 
 # AUTOGRAD, it is what it is
 So I heard you like gradients huh? Well, great! This repository is a small-scale minimalistic deep learning framework inspired by [PyTorch](https://pytorch.org/), but created to be even more simplistic. It works out-of-the-box and the only real dependency is [NumPy](https://numpy.org/), except for some minor libraries to fetch datasets. Please see requirements in the setup guide below.
