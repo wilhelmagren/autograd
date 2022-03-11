@@ -13,8 +13,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-        with:
-          token: ${{ secrets.PAT }}
         
       - name: Count the lines
         uses: shadowmoose/GHA-LoC-Badge@1.0.0
