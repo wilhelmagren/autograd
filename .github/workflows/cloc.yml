@@ -1,23 +1,33 @@
 name: Count Lines of Code
 
 on:
-    push:
-        branches: [main]
-    pull_request:
-        branches: [main]
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
 
 jobs:
-    cloc:
-        runs-on: ubuntu-latest
+  cloc:
+    runs-on: ubuntu-latest
 
-        steps:
-            - uses: actions/checkout@v3
-            - name: Make Code Badge
-              uses: shadowmoose/GHA-LoC-Badge@1.0.0
-              id: badge
-              with:
-                debug: true
-                directory: ./
-                badge: ./output/badge.svg
-                patterns: '**' # Patterns in the format of a '.gitignore' file, separated by pipes.
-                ignore: 'node_modules'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+        
+      - name: Make Code Badge
+        uses: shadowmoose/GHA-LoC-Badge@1.0.0
+        id: badge
+        with:
+          directory: ./
+          badge: ./images/badge.svg
+          patterns: '*.py|*.ipynb|*.md' # Patterns in the format of a '.gitignore' file, separated by pipes.
+          ignore: '*.png|*.svg'
+  
+      - name: Deploy to image branch
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          publish_dir: ./images
+          publish_branch: main
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          user_name: 'github-actions[bot]'
+          user_email: 'github-actions[bot]@users.noreply.github.com'
