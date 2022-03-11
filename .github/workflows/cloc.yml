@@ -1,4 +1,4 @@
-name: Count Lines of Code
+name: lines of code
 
 on:
   push:
