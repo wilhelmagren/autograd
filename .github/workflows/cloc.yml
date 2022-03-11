@@ -21,7 +21,7 @@ jobs:
           debug: False
           directory: ./
           badge: images/cloc.svg
-          ignore: 'images/README'
+          ignore: 'images/|README|*.ipynb'
   
       - name: Commit badge
         uses: stefanzweifel/git-auto-commit-action@v4
