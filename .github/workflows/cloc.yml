@@ -1,4 +1,4 @@
-name: lines of code
+name: Lines of Code
 
 on:
   push:
