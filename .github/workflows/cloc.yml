@@ -21,8 +21,7 @@ jobs:
           debug: False
           directory: ./
           badge: images/cloc.svg
-          patterns: '*.py|*.ipynb|*.md' # Patterns in the format of a '.gitignore' file, separated by pipes.
-          ignore: '*.png|*.svg'
+          ignore: 'images/README'
   
       - name: Commit badge
         uses: stefanzweifel/git-auto-commit-action@v4
