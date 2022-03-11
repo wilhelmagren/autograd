@@ -2,7 +2,7 @@ import os
 import numpy as np
 import unittest
 from tqdm import trange
-from autograd import Tensor, NN, SGD, NLLLoss, fetch_mnist
+from autograd import Tensor, SGD, NLLLoss, fetch_mnist
 from autograd import Adam
 np.random.seed(1)
 
@@ -12,13 +12,24 @@ __optimizers__['sgd'] = SGD
 __optimizers__['adam'] = Adam
 
 
-class MNISTNet(NN):
+class MNISTNet(object):
     def __init__(self):
         self.l1 = Tensor.uniform(784, 128)
         self.l2 = Tensor.uniform(128, 10)
+    
+    def __call__(self, x):
+        return self.forward(x)
 
     def forward(self, x):
         return x.dot(self.l1).relu().dot(self.l2).logsoftmax()
+    
+    def parameters(self):
+        tensors = []
+        for attr in self.__dict__.values():
+            if isinstance(attr, Tensor):
+                if attr.requires_grad:
+                    tensors.append(attr)
+        return tensors
 
 
 class TestMNISTdigits(unittest.TestCase):
