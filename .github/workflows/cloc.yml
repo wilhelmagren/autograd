@@ -12,22 +12,22 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v1
+        uses: actions/checkout@v2
+        with:
+          token: ${{ secrets.PAT }}
         
-      - name: Make Code Badge
+      - name: Count the lines
         uses: shadowmoose/GHA-LoC-Badge@1.0.0
         id: badge
         with:
+          debug: False
           directory: ./
-          badge: ./images/badge.svg
+          badge: images/cloc.svg
           patterns: '*.py|*.ipynb|*.md' # Patterns in the format of a '.gitignore' file, separated by pipes.
           ignore: '*.png|*.svg'
   
-      - name: Deploy to image branch
-        uses: peaceiris/actions-gh-pages@v3
+      - name: Commit badge
+        uses: stefanzweifel/git-auto-commit-action@v4
         with:
-          publish_dir: ./images
-          publish_branch: main
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          user_name: 'github-actions[bot]'
-          user_email: 'github-actions[bot]@users.noreply.github.com'
+          commit_message: Update Lines of Code badge - ${{ steps.badge.outputs.total_lines }}
+          push_options: '--force'
