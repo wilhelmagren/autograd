@@ -10,20 +10,9 @@ License: MIT
 """
 
 from autograd import Tensor
-from autograd.ops import Dot
-
-
-__all__ = [
-    Module,
-    Dense,
-    Conv2d
-]
 
 
 class Module(object):
-    def __init__(self):
-        pass
-
     def __call__(self, x):
         return self.forward(x)
 
@@ -50,3 +39,4 @@ class Conv2d(Module):
     def forward(self, x):
         # x.shape = (B, C, H, W)
         return x
+
