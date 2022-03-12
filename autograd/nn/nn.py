@@ -1,6 +1,6 @@
 """----------------------------------------------------------
 Authors: Wilhelm Ågren <wagren@kth.se>
-Last edited: 11-03-2022
+Last edited: 12-03-2022
 License: MIT
 ----------------------------------------------------------"""
 
@@ -24,7 +24,7 @@ class Module(object):
             elif isinstance(attr, list):
                 params.extend([param for param in attr if param.requires_grad])
             elif isinstance(attr, Sequential):
-                params.extend([param for param in attr.composed() if param.requires_grad])
+                params.extend([param for param in attr.parameters() if param.requires_grad])
         return params
 
 
@@ -40,17 +40,10 @@ class Sequential(object):
             x = module(x)
         return x
     
-    def composed(self):
+    def parameters(self):
         params = []
         for module in self.modules_:
             params.extend(module.parameters())
         return params
 
-
-class Dense(Module):
-    def __init__(self, in_shape, out_shape):
-        self.weight_ = Tensor.uniform(in_shape, out_shape)
-
-    def forward(self, x):
-        return x.dot(self.weight_)
 

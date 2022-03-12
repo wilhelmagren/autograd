@@ -3,11 +3,12 @@ import autograd.nn as nn
 from autograd import Tensor
 
 class TestNN(unittest.TestCase):
-    def test_sequential(self):
+    def test_sequential_dense(self):
         class TestNet(nn.Module):
             def __init__(self):
                 self.params = nn.Sequential(
                         nn.Dense(784, 128),
+                        nn.ReLU(),
                         nn.Dense(128, 10)
                         )
 
