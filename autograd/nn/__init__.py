@@ -1,5 +1,5 @@
-from .nn import Module, Dense, Conv2d
+from .nn import Module, Sequential, Dense
 
 __all__ = [
-    Module, Dense, Conv2d
+    Module, Sequential, Dense
 ]
