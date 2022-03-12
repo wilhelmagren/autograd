@@ -2,7 +2,7 @@ import unittest
 import os
 import numpy as np
 from autograd import Tensor
-from autograd.nn.initializers import Constant
+from autograd.initializers import Constant
 
 
 class TestInitializers(unittest.TestCase):
