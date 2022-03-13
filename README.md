@@ -1,3 +1,5 @@
+![autograd logo](images/autograd.png)
+
 ![Unit Tests Workflow Status Badge](https://github.com/willeagren/autograd/actions/workflows/unittests.yml/badge.svg) ![Count Lines of Code Workflow Status Badge](https://github.com/willeagren/autograd/blob/main/images/cloc.svg) [![GitLicense](https://gitlicense.com/badge/willeagren/autograd)](https://gitlicense.com/license/willeagren/autograd)
 
 # AUTOGRAD, it is what it is
