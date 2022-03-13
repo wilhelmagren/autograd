@@ -9,9 +9,7 @@ It was created as a means to verify and test my personal knowledge on how practi
 ```python
 from autograd import Tensor
 
-# since x is our input data we do not want to change its 
-# values, hence, no gradient required for it.
-x = Tensor([[-1.4, 2.5, 7.3]], requires_grad=False)
+x = Tensor([[-1.4, 2.5, 7.3]])
 w = Tensor.eye(3)
 
 y = x.dot(w).mean()
@@ -22,35 +20,43 @@ print(w.grad)  # dy/dw
 ```
 
 ### Neural networks
-It's really simple, just import the NN class and inherit it with your user defined network. Specify your model parameters as attributes of the class and implement a forward pass. Yield model outputs by invoking a call to the model with your input data. An example pipeline can be seen below.
+It's really simple actually, just import the `autograd.nn` modules and start working! Specify model parameters as attributes of the neural network class and implement a forward pass for your model. You yield outputs by calling your initialized neural network class. Below is an example pipeline for MNIST digits classification.
 ```python
+import autograd.nn as nn
+import numpy as np
 from autograd import Tensor, fetch_mnist
-from autograd import SGD, NLLLoss, NN
+from autograd import Adam, NLLLoss
 
-class Net(NN):
+# define neural network architecture
+class MNISTClassifier(nn.Module):
   def __init__(self):
-    self.l1 = Tensor.uniform(784, 128)
-    self.l2 = Tensor.uniform(128, 10)
+    self.affines_ = nn.Sequential(
+        nn.Dense(784, 128),
+        nn.ReLU(),
+        nn.Dense(128, 10),
+        nn.LogSoftmax()
+        )
   
   def forward(self, x):
-    # implement forward pass however you want
-    return x.dot(self.l1).relu().dot(self.l2).logsoftmax()
+    return self.affines_(x)
 
-# fetch data
+# load MNIST digits data
 X_train, Y_train, X_test, Y_test = fetch_mnist()
-model = Net()
+model = MNISTClassifier()
 optimizer = SGD(model.parameters())
 criterion = NLLLoss()
 
-for _ in epochs:
-  logits = model(X_train)
-  loss = criterion(logits, Y_train)
+for _ in range(epochs):
+  logits = model(Tensor(X_train))
+  loss = criterion(logits, Tensor(Y_train))
   
   optimizer.zero_grad()
   loss.backward()
   optimizer.step()
 
-# and calculate final model score below, like in PyTorch
+# calculate final model score
+Y_test_preds = np.argmax(model(Tensor(X_test)).data, axis=-1)
+acc = (Y_test_preds == Y_test).mean()
 ```
 
 ### Installation
@@ -61,7 +67,6 @@ Just install PyTorch instead.
 python3 -m unittest
 ```
 ### TODO
-- more ops [tanh, log, exp, sigmoid, Conv2d, ...]
-- implement Adam optimizer
+- more ops [tanh, Conv2d, ...]
 - losses module
 - write installation steps and requirements
