@@ -19,7 +19,7 @@ class Function(object):
     
     def apply(self, op, *inputs, **kwargs):
         ctx = op(self, *inputs)
-        output = Tensor(ctx.forward(self.data, *[t.data for t in inputs]), **kwargs)
+        output = Tensor(ctx.forward(self.data, *[t.data for t in inputs], **kwargs))
         output._ctx = ctx
         return output
 
@@ -138,6 +138,38 @@ class Sigmoid(Function):
         return prev_grad * x * (1 - x)
 
 
+class Conv2d(Function):
+    def forward(self, x, k, stride=1, padding=0):
+
+        if isinstance(stride, int):
+            stride = (stride, stride)
+
+        if isinstance(padding, int):
+            padding = (padding, padding)
+        
+        batch_size, input_C_, input_H, input_W = x.shape
+        output_C, input_C, kernel_H, kernel_W = k.shape
+
+        assert input_C_ == input_C
+
+        stride_H, stride_W = stride
+        pad_H, pad_W = padding
+        out_H = 1 + (input_H - kernel_H + 2*pad_H) // stride_H
+        out_W = 1 + (input_W - kernel_W + 2*pad_W) // stride_W
+        features = np.zeros((batch_size, output_C, out_H, out_W)).astype(x.dtype)
+        GEMM_kernels = k.reshape(output_C, -1).T
+        
+        for h in range(out_H):
+            for w in range(out_W):
+                area = x[:, :, h:h+kernel_H, w:w+kernel_W].reshape(batch_size, -1)
+                features[:, :, h, w] = area.dot(GEMM_kernels)
+
+        return features
+
+    def backward(self, prev_grad):
+        pass
+
+
 __allops__ = [
     ('mean', Mean),
     ('sum', Sum),
@@ -149,7 +181,8 @@ __allops__ = [
     ('logsoftmax', LogSoftmax),
     ('exp', Exp),
     ('log', Log),
-    ('sigmoid', Sigmoid)
+    ('sigmoid', Sigmoid),
+    ('conv2d', Conv2d)
 ]
 
 
