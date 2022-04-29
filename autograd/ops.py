@@ -140,6 +140,7 @@ class Sigmoid(Function):
 
 class Conv2d(Function):
     def forward(self, x, k, stride=1, padding=0):
+        self.save_for_backward(x, k)
 
         if isinstance(stride, int):
             stride = (stride, stride)
@@ -159,6 +160,8 @@ class Conv2d(Function):
         features = np.zeros((batch_size, output_C, out_H, out_W)).astype(x.dtype)
         GEMM_kernels = k.reshape(output_C, -1).T
         
+        # this might be very slow, look into GEMM approach
+        # GEneric Matrix to Matrix Computation
         for h in range(out_H):
             for w in range(out_W):
                 area = x[:, :, h:h+kernel_H, w:w+kernel_W].reshape(batch_size, -1)
@@ -167,7 +170,10 @@ class Conv2d(Function):
         return features
 
     def backward(self, prev_grad):
-        pass
+        batch_size, _, out_H, out_W = prev_grad.shape
+        x, w = self.saved_tensors
+        dx, dw = np.zeros_like(x), np.zeros_like(w)
+        return dx, dw
 
 
 __allops__ = [
