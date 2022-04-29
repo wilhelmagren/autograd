@@ -58,7 +58,8 @@ class TestOps(unittest.TestCase):
         _test_op([(56, 82)], lambda x: x.relu(), Tensor.relu, 'relu')
 
     def test_logsoftmax(self):
-        _test_op([(56, 82)], lambda x: torch.nn.LogSoftmax(dim=1)(x), Tensor.logsoftmax, 'logsoftmax')
+        _test_op([(56, 82)], lambda x: torch.nn.LogSoftmax(dim=1)(x),
+                Tensor.logsoftmax, 'logsoftmax')
 
     def test_exp(self):
         _test_op([(56, 82)], lambda x: x.exp(), Tensor.exp, 'exp')
@@ -68,4 +69,8 @@ class TestOps(unittest.TestCase):
 
     def test_sigmoid(self):
         _test_op([(56, 82)], lambda x: x.sigmoid(), Tensor.sigmoid, 'sigmoid')
+
+    def test_conv2d(self):
+        _test_op([(8, 2, 32, 32), (4, 2, 7, 7)], lambda x, k:
+                torch.nn.functional.conv2d(x, k), Tensor.conv2d, 'conv2d')
 
