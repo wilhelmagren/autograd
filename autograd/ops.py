@@ -139,41 +139,46 @@ class Sigmoid(Function):
 
 
 class Conv2d(Function):
-    def forward(self, x, k, stride=1, padding=0):
-        self.save_for_backward(x, k)
-
+    def forward(self, x, k, stride=1):
         if isinstance(stride, int):
             stride = (stride, stride)
-
-        if isinstance(padding, int):
-            padding = (padding, padding)
         
         batch_size, input_C_, input_H, input_W = x.shape
         output_C, input_C, kernel_H, kernel_W = k.shape
 
         assert input_C_ == input_C
-
-        stride_H, stride_W = stride
-        pad_H, pad_W = padding
-        out_H = 1 + (input_H - kernel_H + 2*pad_H) // stride_H
-        out_W = 1 + (input_W - kernel_W + 2*pad_W) // stride_W
-        features = np.zeros((batch_size, output_C, out_H, out_W)).astype(x.dtype)
-        GEMM_kernels = k.reshape(output_C, -1).T
         
-        # this might be very slow, look into GEMM approach
-        # GEneric Matrix to Matrix Computation
+        self.save_for_backward(x, k)
+        stride_H, stride_W = stride
+        out_H = 1 + (input_H - kernel_H) // stride_H
+        out_W = 1 + (input_W - kernel_W) // stride_W
+        mat_k = k.reshape(output_C, -1).T
+
+        featuremaps = np.zeros((batch_size, output_C, out_H,
+            out_W)).astype(x.dtype)
         for h in range(out_H):
             for w in range(out_W):
-                area = x[:, :, h:h+kernel_H, w:w+kernel_W].reshape(batch_size, -1)
-                features[:, :, h, w] = area.dot(GEMM_kernels)
+                mat_x = x[:, :, h:h+kernel_H, w:w+kernel_W].reshape(batch_size, -1)
+                featuremaps[:, :, h, w] = mat_x.dot(mat_k)
 
-        return features
+        return featuremaps
 
     def backward(self, prev_grad):
         batch_size, _, out_H, out_W = prev_grad.shape
-        x, w = self.saved_tensors
-        dx, dw = np.zeros_like(x), np.zeros_like(w)
-        return dx, dw
+        x, k = self.saved_tensors
+        output_C, input_C, kernel_H, kernel_W = k.shape
+        mat_k = k.reshape(output_C, -1)
+
+        dx, dk = np.zeros_like(x), np.zeros_like(k)
+        for h in range(out_H):
+            for w in range(out_W):
+                g = prev_grad[:, :, h, w]
+                mat_x = x[:, :, h:h+kernel_H, w:w+kernel_W].reshape(batch_size, -1)
+                dk += g.T.dot(mat_x).reshape(dk.shape)
+                dx[:, :, h:h+kernel_H, w:w+kernel_W] += g.dot(mat_k).reshape(batch_size,
+                        input_C, kernel_H, kernel_W)
+
+        return dx, dk
 
 
 __allops__ = [
