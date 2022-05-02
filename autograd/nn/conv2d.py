@@ -3,7 +3,7 @@ from autograd.nn import Module
 
 
 class Conv2d(Module):
-    def __init__(self, in_channels, out_channels, height, width, stride=1, padding=0):
+    def __init__(self, out_channels, in_channels, height, width, stride=1, padding=0):
         if isinstance(stride, int):
             stride = (stride, stride)
         
