@@ -181,6 +181,16 @@ class Conv2d(Function):
         return dx, dk
 
 
+class Reshape(Function):
+    def forward(self, x, shape):
+        self.save_for_backward(x.shape)
+        return x.reshape(shape)
+    
+    def backward(self, prev_grad):
+        x_shape, = self.saved_tensors
+        return prev_grad.reshape(x_shape)
+
+
 __allops__ = [
     ('mean', Mean),
     ('sum', Sum),
@@ -193,7 +203,8 @@ __allops__ = [
     ('exp', Exp),
     ('log', Log),
     ('sigmoid', Sigmoid),
-    ('conv2d', Conv2d)
+    ('conv2d', Conv2d),
+    ('reshape', Reshape)
 ]
 
 
